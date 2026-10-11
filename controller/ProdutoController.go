@@ -14,23 +14,21 @@ type ProdutoController struct {
 	service *service.ProdutoService
 }
 
-
 func NewProdutoController(service *service.ProdutoService) *ProdutoController {
 	return &ProdutoController{service: service}
 }
 
 // Save recebe os dados do produto e realiza o cadastro. (POST)
-func (c *ProdutoController) Save(w http.ResponseWriter, r *http.Request) { 		// w = resposta http que sai
-	var produto entities.Produto										   		// r = requisição http que entra
+func (c *ProdutoController) Save(w http.ResponseWriter, r *http.Request) {
+	var produto entities.Produto
 
-	if err := json.NewDecoder(r.Body).Decode(&produto); err != nil {			// body = corpo da requisição HTTP
+	if err := json.NewDecoder(r.Body).Decode(&produto); err != nil {
 		http.Error(w, "Dados inválidos", http.StatusBadRequest)
 		return
 	}
 
 	if err := c.service.Save(&produto); err != nil {
-		if errors.Is(err, service.ErrNomeObrigatorio) ||					//nome obrigatório OU preço inválido
-			errors.Is(err, service.ErrPrecoInvalido) {
+		if errors.Is(err, service.ErrNomeObrigatorio) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -40,7 +38,7 @@ func (c *ProdutoController) Save(w http.ResponseWriter, r *http.Request) { 		// 
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(produto)									 //converte o produto pra JSON
+	json.NewEncoder(w).Encode(produto)
 }
 
 // FindAll retorna todos os produtos cadastrados. (GET)
@@ -97,8 +95,9 @@ func (c *ProdutoController) Update(w http.ResponseWriter, r *http.Request) {
 
 	err = c.service.Update(id, produto)
 
-	if errors.Is(err, service.ErrNomeObrigatorio) ||
-		errors.Is(err, service.ErrPrecoInvalido) {
+		if errors.Is(err, service.ErrNomeObrigatorio) ||
+		errors.Is(err, service.ErrQuantidadeTotalCarroInvalida) {
+
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

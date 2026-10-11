@@ -54,7 +54,7 @@ func (r *ProdutoRepository) Delete(id int) error {
 func (r *ProdutoRepository) Update(id int, produto entities.Produto) error {
 	result := r.db.Model(&entities.Produto{}).
 		Where("id = ?", id). 						//atualize somente onde o ID for igual ao id recebido.
-		Select("Nome", "Preco").                    //Quero atualizar especificamente os campos Nome e Preco
+		Select("Nome", "QuantidadeTotalCarro").                    //Quero atualizar especificamente os campos Nome
 		Updates(produto)
 
 	if result.Error != nil {
